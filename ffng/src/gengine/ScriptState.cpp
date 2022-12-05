@@ -10,7 +10,12 @@
 
 #include "Log.h"
 #include "Path.h"
+#if DANDAN
 #include "ScriptException.h"
+#else
+#include "core/error_macros.h"
+#include "core/os/file_access.h"
+#endif
 
 extern "C" {
 #include "lualib.h"
@@ -84,7 +89,11 @@ ScriptState::callStack(int error, int params, int returns)
         ExInfo info = ExInfo("script failure")
             .addInfo("error", msg);
         lua_pop(m_state, 1);
+#if DANDAN
         throw ScriptException(info);
+#else
+        ERR_FAIL_MSG(info.info().c_str());
+#endif
     }
 }
 //-----------------------------------------------------------------
@@ -95,8 +104,16 @@ ScriptState::callStack(int error, int params, int returns)
     void
 ScriptState::doFile(const Path &file)
 {
+#if DANDAN
     int error = luaL_loadfile(m_state, file.getNative().c_str());
     callStack(error);
+#else
+    Error error;
+    String s = FileAccess::get_file_as_string(file.getNative().c_str(), &error);
+    if (error == OK) {
+        doString(s.utf8().get_data());
+    }
+#endif
 }
 //-----------------------------------------------------------------
 /**
@@ -136,9 +153,14 @@ ScriptState::callCommand(int funcRef, int param)
     if (0 == lua_isboolean(m_state, -1)) {
         const char *type = lua_typename(m_state, lua_type(m_state, -1));
         lua_pop(m_state, numResults);
+#if DANDAN
         throw ScriptException(
                 ExInfo("script command failure - boolean expected")
                 .addInfo("got", type));
+#else
+        ERR_FAIL_V_MSG(false, ExInfo("script command failure - boolean expected")
+                .addInfo("got", type).info().c_str());
+#endif
     }
     bool result = lua_toboolean(m_state, -1);
     lua_pop(m_state, numResults);

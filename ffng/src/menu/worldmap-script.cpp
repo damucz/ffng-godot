@@ -17,7 +17,11 @@
     inline WorldBranch *
 getWorld(lua_State *L)
 {
+#ifndef NO_SAFE_CAST
     return dynamic_cast<WorldBranch*>(script_getLeader(L));
+#else
+    return static_cast<WorldBranch*>(script_getLeader(L));
+#endif
 }
 
 //-----------------------------------------------------------------

@@ -13,7 +13,9 @@
 #include "ScriptState.h"
 
 #include "ScriptCmd.h"
+#if DANDAN
 #include "LogicException.h"
+#endif
 #include "Cube.h"
 #include "Unit.h"
 

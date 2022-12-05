@@ -11,7 +11,9 @@
 #include "Log.h"
 #include "Path.h"
 #include "ResImagePack.h"
+#if DANDAN
 #include "LogicException.h"
+#endif
 #include "StringTool.h"
 
 #include "EffectNone.h"
@@ -176,9 +178,15 @@ void
 Anim::changeEffect(ViewEffect *new_effect)
 {
     if (NULL == new_effect) {
+#if DANDAN
         throw LogicException(ExInfo("new_effect is NULL")
                 .addInfo("animName", m_animName)
                 .addInfo("specialAnimName", m_specialAnimName));
+#else
+        ERR_FAIL_MSG(ExInfo("new_effect is NULL")
+                .addInfo("animName", m_animName)
+                .addInfo("specialAnimName", m_specialAnimName).info().c_str());
+#endif
     }
 
     delete m_effect;

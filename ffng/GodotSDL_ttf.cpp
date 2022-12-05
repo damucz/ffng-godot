@@ -1,4 +1,5 @@
 #include "GodotSDL_ttf.h"
+#include <string>
 
 int TTF_Init() {
     return 0;

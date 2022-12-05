@@ -12,7 +12,9 @@
 
 #include "MessagerAgent.h"
 #include "SimpleMsg.h"
+#if DANDAN
 #include "LogicException.h"
+#endif
 
 //-----------------------------------------------------------------
 StateManager::~StateManager()
@@ -140,8 +142,13 @@ StateManager::findIter(GameState *who)
             return i;
         }
     }
+#if DANDAN
     throw LogicException(ExInfo("game state is not found in stack")
             .addInfo("state", who ? who->getName() : "(null)"));
+#else
+    ERR_FAIL_V_MSG(end, ExInfo("game state is not found in stack")
+            .addInfo("state", who ? who->getName() : "(null)").info().c_str());
+#endif
 }
 //-----------------------------------------------------------------
 /**
@@ -154,7 +161,11 @@ void
 StateManager::checkStack()
 {
     if (m_states.empty()) {
+#if DANDAN
         throw LogicException(ExInfo("game state stack is empty"));
+#else
+        ERR_FAIL_MSG(ExInfo("game state stack is empty").info().c_str());
+#endif
     }
 
     t_states::iterator topIt = m_states.end();

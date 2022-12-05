@@ -2,14 +2,10 @@
 #include "Application.h"
 #include "TimerAgent.h"
 #include "GodotSDL.h"
-#include <scene/resources/texture.h>
 #include <core/os/input.h>
 #include <core/os/keyboard.h>
 #include <core/error_macros.h>
 #include <scene/main/viewport.h>
-
-#include "servers/audio/audio_stream.h"
-#include "scene/audio/audio_stream_player.h"
 
 void ffng::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("_input"), &ffng::_input);

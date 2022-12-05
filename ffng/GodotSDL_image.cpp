@@ -12,7 +12,7 @@ SDL_Surface* IMG_Load(const char* filename) {
         return nullptr;
     }
     else {
-        WARN_PRINT(vformat("texture %s loaded (%d x %d)", filename, texture->get_width(), texture->get_height()));
+        //WARN_PRINT(vformat("texture %s loaded (%d x %d)", filename, texture->get_width(), texture->get_height()));
         surface->w = texture->get_width();
         surface->h = texture->get_height();
         surface->texture = texture->get_rid();

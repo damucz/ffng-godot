@@ -45,10 +45,12 @@ EffectMirror::EffectMirror() {
 
                     vec4 color = texture(TEXTURE, UV);
                     vec4 delta = abs(color - mask);
-                    color = length(delta) < 0.1 ? screen_color : color;
+                    if (length(delta) < 0.1)
+                        color = screen_color;
                     COLOR = color;
                 }
                 )");
+        SDL_shaders[NAME] = shader;
     }
 
     DEV_ASSERT(shader.is_valid());

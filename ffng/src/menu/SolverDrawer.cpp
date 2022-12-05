@@ -14,7 +14,9 @@
 #include "Labels.h"
 #include "LevelStatus.h"
 #include "WiPara.h"
+#if DANDAN
 #include "BaseException.h"
+#endif
 
 //-----------------------------------------------------------------
 /**
@@ -23,7 +25,9 @@
  */
 SolverDrawer::SolverDrawer(LevelStatus *status)
 {
+#if DANDAN
     try {
+#endif
         FFont usedFont(Path::dataReadPath("font/font_menu.ttf"), 14);
         SDL_Color usedColor = {255, 255, 255, 255};
 
@@ -50,9 +54,11 @@ SolverDrawer::SolverDrawer(LevelStatus *status)
         para->enableCentered();
         para->recenter();
         addWidget(para);
+#if DANDAN
     }
     catch (BaseException &e) {
         LOG_WARNING(e.info());
     }
+#endif
 }
 

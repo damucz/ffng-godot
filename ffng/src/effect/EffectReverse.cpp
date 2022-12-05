@@ -35,6 +35,7 @@ EffectReverse::EffectReverse()
                     COLOR = texture(TEXTURE, vec2(1.0 - UV.x, UV.y));
                 }
                 )");
+        SDL_shaders[NAME] = shader;
     }
 
     DEV_ASSERT(shader.is_valid());

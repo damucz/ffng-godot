@@ -44,7 +44,11 @@ LevelInput::LevelInput(Level *level)
 Level *
 LevelInput::getLevel()
 {
+#ifndef NO_SAFE_CAST
     return dynamic_cast<Level*>(m_state);
+#else
+    return static_cast<Level*>(m_state);
+#endif
 }
 //-----------------------------------------------------------------
 void

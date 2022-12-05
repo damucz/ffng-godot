@@ -42,7 +42,7 @@ RopeDecor::drawOnScreen(const View *view, SDL_Surface *screen)
             loc2.getX(), loc2.getY(), colorRGBA);
 #else
     auto* vs = VS::get_singleton();
-    DEV_ASSERT(screen->type == SDL_Surface::Type::SCREEN || screen->type == SDL_Surface::Type::VIEWPORT);
+    DEV_ASSERT(screen->type == SDL_Surface::Type::VIEWPORT);
     _SDL_CheckCanvasAndMaterial(screen);
     RID canvas_item = screen->canvas_items.back()->get();
     vs->canvas_item_add_line(canvas_item, {(real_t)loc1.getX(), (real_t)loc1.getY()}, {(real_t)loc2.getX(), (real_t)loc2.getY()},

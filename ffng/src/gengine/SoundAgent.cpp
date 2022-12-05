@@ -10,7 +10,9 @@
 
 #include "OptionAgent.h"
 #include "StringMsg.h"
+#if DANDAN
 #include "UnknownMsgException.h"
+#endif
 
 //-----------------------------------------------------------------
 /**
@@ -61,7 +63,11 @@ SoundAgent::receiveString(const StringMsg *msg)
         }
     }
     else {
+#if DANDAN
         throw UnknownMsgException(msg);
+#else
+        ERR_FAIL_MSG(msg->toString().c_str());
+#endif
     }
 }
 

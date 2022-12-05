@@ -65,12 +65,15 @@ EffectZx::EffectZx()
                     float shift = count_height * TEXTURE_PIXEL_SIZE.y;
                     float height = stripe_height * TEXTURE_PIXEL_SIZE.y;
                     //vec4 color = vec4(1.0, 0.0, 0.0, 1.0);
-                    vec4 color = mod(UV.y + shift, 2.0 * height) > height ? color1 : color2;
+                    vec4 color = color2;
+                    if (mod(UV.y + shift, 2.0 * height) > height)
+                        color = color1;
 
                     vec4 bg = texture(TEXTURE, UV);
                     COLOR = vec4(color.rgb, color.a * bg.a);
                 }
                 )");
+        SDL_shaders[NAME] = shader;
     }
 
     DEV_ASSERT(shader.is_valid());

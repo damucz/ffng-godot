@@ -1,5 +1,6 @@
 #include "GodotSDL_mixer.h"
 #include "core/math/math_funcs.h"
+#include <string>
 
 Mix_Channel Mix_channels[Mix_MaxChannels];
 
@@ -45,7 +46,7 @@ Mix_Chunk* Mix_LoadWAV(const char* filename) {
     DEV_ASSERT(error == OK);
     if (error != OK) {
 		ERR_PRINT(vformat("Can't load sound: \"%s\"", String(filename)));
-        chunk->stream = nullptr;
+        chunk->stream = Ref<AudioStreamOGGVorbis>();
     }
     else {
         chunk->stream->set_loop(false);

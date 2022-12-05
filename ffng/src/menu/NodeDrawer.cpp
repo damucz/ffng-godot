@@ -110,7 +110,6 @@ NodeDrawer::drawDot(SDL_Surface *dot, const V2 &loc) const
 void
 NodeDrawer::drawSelect(const V2 &loc) const
 {
-
     const SDL_Surface *dot = m_imagePack->getRes("solved");
     int radius = max(dot->w, dot->h) / 2 + 1;
     Uint32 colorRGBA = 0xffc61880;
@@ -119,7 +118,7 @@ NodeDrawer::drawSelect(const V2 &loc) const
     filledCircleColor(m_screen, loc.getX(), loc.getY(), radius, colorRGBA);
 #else
     auto* vs = VS::get_singleton();
-    DEV_ASSERT(m_screen->type == SDL_Surface::Type::SCREEN || m_screen->type == SDL_Surface::Type::VIEWPORT);
+    DEV_ASSERT(m_screen->type == SDL_Surface::Type::VIEWPORT);
     _SDL_CheckCanvasAndMaterial(m_screen);
     RID canvas_item = m_screen->canvas_items.back()->get();
     vs->canvas_item_add_circle(canvas_item, {(real_t)loc.getX(), (real_t)loc.getY()}, radius, Color(1.0f, 0.776f, 0.094f, 0.5f));
@@ -164,7 +163,7 @@ NodeDrawer::drawEdge(const LevelNode *start, const LevelNode *end) const
     aalineColor(m_screen, x1 + 1, y1 - 1 , x2 + 1, y2 - 1, colorRGBA);
 #else
     auto* vs = VS::get_singleton();
-    DEV_ASSERT(m_screen->type == SDL_Surface::Type::SCREEN || m_screen->type == SDL_Surface::Type::VIEWPORT);
+    DEV_ASSERT(m_screen->type == SDL_Surface::Type::VIEWPORT);
     _SDL_CheckCanvasAndMaterial(m_screen);
     RID canvas_item = m_screen->canvas_items.back()->get();
     vs->canvas_item_add_line(canvas_item, {(real_t)x1, (real_t)y1}, {(real_t)x2, (real_t)y2}, Color(1.0f, 1.0f, 0.0f, 1.0f), 3.0f, true);

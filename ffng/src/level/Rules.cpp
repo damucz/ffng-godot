@@ -12,7 +12,9 @@
 #include "MarkMask.h"
 
 #include "Log.h"
+#if DANDAN
 #include "LayoutException.h"
+#endif
 #include "OnStack.h"
 #include "OnWall.h"
 #include "OnStrongPad.h"
@@ -66,9 +68,15 @@ Rules::takeField(Field *field)
     m_mask = new MarkMask(m_model, field);
     Cube::t_models resist = m_mask->getResist(Dir::DIR_NO);
     if (!resist.empty()) {
+#if DANDAN
         throw LayoutException(ExInfo("position is occupied")
                 .addInfo("model", m_model->toString())
                 .addInfo("resist", resist.front()->toString()));
+#else
+        ERR_FAIL_MSG(ExInfo("position is occupied")
+                .addInfo("model", m_model->toString())
+                .addInfo("resist", resist.front()->toString()).info().c_str());
+#endif
     }
 
     m_mask->mask();

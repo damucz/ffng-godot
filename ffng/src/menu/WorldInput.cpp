@@ -29,7 +29,11 @@ WorldInput::WorldInput(WorldMap *world)
 WorldMap *
 WorldInput::getWorld()
 {
+#ifndef NO_SAFE_CAST
     return dynamic_cast<WorldMap*>(m_state);
+#else
+    return static_cast<WorldMap*>(m_state);
+#endif
 }
 //-----------------------------------------------------------------
 void

@@ -16,7 +16,9 @@
 #include "ScriptState.h"
 #include "ResDialogPack.h"
 #include "LevelDesc.h"
+#if DANDAN
 #include "LogicException.h"
+#endif
 
 #include "worldmap-script.h"
 
@@ -54,8 +56,13 @@ WorldBranch::parseMap(const Path &datafile, LevelNode **outEnding,
             *outEnding = m_ending;
         }
         else {
+#if DANDAN
             throw LogicException(ExInfo("cannot export ending node")
                     .addInfo("ending", m_ending->getCodename()));
+#else
+            ERR_FAIL_V_MSG(nullptr, ExInfo("cannot export ending node")
+                    .addInfo("ending", m_ending->getCodename()).info().c_str());
+#endif
         }
     }
 
@@ -72,8 +79,13 @@ WorldBranch::addDesc(const std::string &codename, LevelDesc *desc)
         m_outPack->addRes(codename, desc);
     }
     else {
+#if DANDAN
         throw LogicException(ExInfo("cannot export level description")
                 .addInfo("codename", codename));
+#else
+        ERR_FAIL_MSG(ExInfo("cannot export level description")
+                .addInfo("codename", codename).info().c_str());
+#endif
     }
 }
 //-----------------------------------------------------------------
@@ -165,11 +177,19 @@ WorldBranch::prepareNode(LevelNode *node, bool hidden)
 void
 WorldBranch::insertNode(const std::string &parent, LevelNode *new_node)
 {
+#if DANDAN
     try {
+#endif
         if (parent == "" && m_root) {
+#if DANDAN
             throw LogicException(ExInfo("there is a one root node already")
                     .addInfo("root", m_root->getCodename())
                     .addInfo("new_node", new_node->getCodename()));
+#else
+            ERR_FAIL_MSG(ExInfo("there is a one root node already")
+                    .addInfo("root", m_root->getCodename())
+                    .addInfo("new_node", new_node->getCodename()).info().c_str());
+#endif
         }
 
         if (m_root) {
@@ -178,23 +198,37 @@ WorldBranch::insertNode(const std::string &parent, LevelNode *new_node)
                 parentNode->addChild(new_node);
             }
             else {
+#if DANDAN
                 throw LogicException(ExInfo("there is no such parent node")
                         .addInfo("parent", parent)
                         .addInfo("new_node", new_node->getCodename()));
+#else
+                ERR_FAIL_MSG(ExInfo("there is no such parent node")
+                        .addInfo("parent", parent)
+                        .addInfo("new_node", new_node->getCodename()).info().c_str());
+#endif
             }
         }
         else {
             if (parent != "") {
+#if DANDAN
                 LOG_WARNING(ExInfo("root node should have empty parent")
                         .addInfo("parent", parent)
                         .addInfo("new_node", new_node->getCodename()));
+#else
+                ERR_FAIL_MSG(ExInfo("root node should have empty parent")
+                        .addInfo("parent", parent)
+                        .addInfo("new_node", new_node->getCodename()).info().c_str());
+#endif
             }
             m_root = new_node;
         }
+#if DANDAN
     }
     catch (...) {
         delete new_node;
         throw;
     }
+#endif
 }
 

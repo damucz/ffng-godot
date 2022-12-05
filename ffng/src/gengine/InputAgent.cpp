@@ -13,7 +13,9 @@
 
 #include "MessagerAgent.h"
 #include "SimpleMsg.h"
+#if DANDAN
 #include "UnknownMsgException.h"
+#endif
 #include "Name.h"
 #include "MouseStroke.h"
 

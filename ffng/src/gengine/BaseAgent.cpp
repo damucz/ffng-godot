@@ -9,7 +9,9 @@
 #include "BaseAgent.h"
 
 #include "Log.h"
+#if DANDAN
 #include "LogicException.h"
+#endif
 
 //-----------------------------------------------------------------
 BaseAgent::BaseAgent()
@@ -33,8 +35,13 @@ BaseAgent::init()
 BaseAgent::update()
 {
     if (!m_initialized) {
+#if DANDAN
         throw LogicException(ExInfo("agent is not ready")
             .addInfo("name", getName()));
+#else
+        ERR_FAIL_MSG(ExInfo("agent is not ready")
+            .addInfo("name", getName()).info().c_str());
+#endif
     }
 
     own_update();

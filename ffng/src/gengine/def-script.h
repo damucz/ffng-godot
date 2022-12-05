@@ -13,6 +13,7 @@ extern "C" {
 }
 
 
+#if DANDAN
 //NOTE: no one exception can be passed to "C" lua code
 #define BEGIN_NOEXCEPTION try {
 #define END_NOEXCEPTION \
@@ -23,6 +24,10 @@ catch (std::exception &e) { \
 catch (...) { \
     luaL_error(L, "unknown exception"); \
 }
+#else
+#define BEGIN_NOEXCEPTION {
+#define END_NOEXCEPTION }
+#endif
 
 inline const char *script_getLeaderName() { return "script_leader"; }
 extern Scripter *script_getLeader(lua_State *L);

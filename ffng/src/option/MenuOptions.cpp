@@ -28,7 +28,9 @@
 #include "SurfaceTool.h"
 #endif
 #include "StringMsg.h"
+#if DANDAN
 #include "UnknownMsgException.h"
+#endif
 
 //-----------------------------------------------------------------
 MenuOptions::MenuOptions()
@@ -248,11 +250,19 @@ MenuOptions::receiveString(const StringMsg *msg)
             m_needRefresh = true;
         }
         else {
+#if DANDAN
             throw UnknownMsgException(msg);
+#else
+            ERR_FAIL_MSG(msg->toString().c_str());
+#endif
         }
     }
     else {
+#if DANDAN
         throw UnknownMsgException(msg);
+#else
+        ERR_FAIL_MSG(msg->toString().c_str());
+#endif
     }
 }
 

@@ -11,7 +11,11 @@
 #include "V2.h"
 #include "Unit.h"
 #include "FShape.h"
+#if DANDAN
 #include "LogicException.h"
+#else
+#include "ExInfo.h"
+#endif
 #include "StringTool.h"
 
 //-----------------------------------------------------------------
@@ -86,8 +90,13 @@ ModelFactory::createParams(const std::string &kind,
             *out_weight = Cube::FIXED;
         }
         else {
+#if DANDAN
             throw LogicException(ExInfo("unknown model kind")
                     .addInfo("kind", kind));
+#else
+            ERR_FAIL_MSG(ExInfo("unknown model kind")
+                    .addInfo("kind", kind).info().c_str());
+#endif
         }
     }
 }
@@ -164,8 +173,13 @@ ModelFactory::createOutputItem(const std::string &kind, const V2 &loc,
         outDir = Dir::DIR_DOWN;
     }
     else {
+#if DANDAN
         throw LogicException(ExInfo("unknown border dir")
                 .addInfo("kind", kind));
+#else
+        ERR_FAIL_V_MSG(nullptr, ExInfo("unknown border dir")
+                .addInfo("kind", kind).info().c_str());
+#endif
     }
 
     Cube *model = new Cube(loc,
@@ -184,8 +198,13 @@ ModelFactory::parseExtraControlSym(const std::string &kind)
 {
     static const std::string PREFIX = "fish_extra-";
     if (kind.size() != PREFIX.size() + 4) {
+#if DANDAN
         throw LogicException(ExInfo("you must specify control symbols")
                 .addInfo("kind", kind));
+#else
+        ERR_FAIL_V_MSG(ControlSym(' ', ' ', ' ', ' '), ExInfo("you must specify control symbols")
+                .addInfo("kind", kind).info().c_str());
+#endif
     }
 
     char up = kind[PREFIX.size()];

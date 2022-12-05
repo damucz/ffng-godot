@@ -19,8 +19,10 @@
 
 #include "Log.h"
 #include "Rules.h"
+#if DANDAN
 #include "LogicException.h"
 #include "LoadException.h"
+#endif
 #include "Unit.h"
 #include "TimerAgent.h"
 #include "SubTitleAgent.h"
@@ -136,8 +138,13 @@ FRoom::getModel(int model_index)
         result = m_models[model_index];
     }
     else {
+#if DANDAN
         throw LogicException(ExInfo("bad model index")
                 .addInfo("model_index", model_index));
+#else
+        ERR_FAIL_V_MSG(nullptr, ExInfo("bad model index")
+                .addInfo("model_index", model_index).info().c_str());
+#endif
     }
 
     return result;
@@ -422,8 +429,13 @@ FRoom::makeMove(char move)
     bool result = false;
     if (isFresh()) {
         if (!m_controls->makeMove(move)) {
+#if DANDAN
             throw LoadException(ExInfo("load error - bad move")
                     .addInfo("move", std::string(1, move)));
+#else
+            ERR_FAIL_V_MSG(false, ExInfo("load error - bad move")
+                    .addInfo("move", std::string(1, move)).info().c_str());
+#endif
         }
         m_lastAction = Cube::ACTION_MOVE;
         result = true;

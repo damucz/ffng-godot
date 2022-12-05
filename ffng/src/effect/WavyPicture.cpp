@@ -49,6 +49,7 @@ WavyPicture::WavyPicture(const Path &file, const V2 &loc)
                     COLOR = texture(TEXTURE, UV + wave_uv_offset);
                 }
                 )");
+        SDL_shaders["wavy"] = shader;
     }
 
     m_material = vs->material_create();

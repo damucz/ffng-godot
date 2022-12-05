@@ -9,8 +9,10 @@
 #include "AgentPack.h"
 
 #include "BaseAgent.h"
+#if DANDAN
 #include "LogicException.h"
 #include "NameException.h"
+#endif
 #include "MessagerAgent.h"
 
 AgentPack *AgentPack::ms_singleton = NULL;
@@ -19,7 +21,11 @@ AgentPack::AgentPack()
 {
     //NOTE: this is not thread safe
     if (ms_singleton) {
+#if DANDAN
         throw LogicException(ExInfo("AgentPack is singleton"));
+#else
+        ERR_FAIL_MSG(ExInfo("AgentPack is singleton").info().c_str());
+#endif
     }
 
     ms_singleton = this;
@@ -53,8 +59,13 @@ AgentPack::addAgent(BaseAgent *agent)
         m_agents.insert(
                 std::pair<std::string,BaseAgent*>(agent->getName(), agent));
     if (!status.second) {
+#if DANDAN
         throw NameException(ExInfo("agent already exists")
                 .addInfo("name", agent->getName()));
+#else
+        ERR_FAIL_MSG(ExInfo("agent already exists")
+                .addInfo("name", agent->getName()).info().c_str());
+#endif
     }
 
     MessagerAgent::agent()->addListener(agent);
@@ -87,18 +98,32 @@ AgentPack::removeAgent(const std::string &name)
 AgentPack::getAgent(const std::string &name)
 {
     if (NULL == ms_singleton) {
+#if DANDAN
         throw LogicException(ExInfo("AgentPack is not ready"));
+#else
+        ERR_FAIL_V_MSG(nullptr, ExInfo("AgentPack is not ready").info().c_str());
+#endif
     }
 
     t_agents::iterator it = ms_singleton->m_agents.find(name);
     if (ms_singleton->m_agents.end() == it) {
+#if DANDAN
         throw NameException(ExInfo("cannot find agent")
                 .addInfo("name", name));
+#else
+        ERR_FAIL_V_MSG(nullptr, ExInfo("cannot find agent")
+                .addInfo("name", name).info().c_str());
+#endif
     }
 
     if (!it->second->isInitialized()) {
+#if DANDAN
         throw LogicException(ExInfo("agent is not initialized")
                 .addInfo("name", name));
+#else
+        ERR_FAIL_V_MSG(nullptr, ExInfo("agent is not initialized")
+                .addInfo("name", name).info().c_str());
+#endif;
     }
     return it->second;
 }

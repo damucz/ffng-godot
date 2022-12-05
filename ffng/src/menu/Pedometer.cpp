@@ -20,7 +20,9 @@
 #include "Level.h"
 #include "minmax.h"
 #include "StringMsg.h"
+#if DANDAN
 #include "UnknownMsgException.h"
+#endif
 
 //-----------------------------------------------------------------
 Pedometer::Pedometer(LevelStatus *status, Level *new_level)
@@ -258,10 +260,18 @@ Pedometer::receiveString(const StringMsg *msg)
             prepareBg();
         }
         else {
+#if DANDAN
             throw UnknownMsgException(msg);
+#else
+            ERR_FAIL_MSG(msg->toString().c_str());
+#endif
         }
     }
     else {
+#if DANDAN
         throw UnknownMsgException(msg);
+#else
+        ERR_FAIL_MSG(msg->toString().c_str());
+#endif
     }
 }

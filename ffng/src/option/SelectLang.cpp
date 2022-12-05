@@ -19,7 +19,11 @@
     inline SelectLang *
 getSelect(lua_State *L)
 {
+#ifndef NO_SAFE_CAST
     return dynamic_cast<SelectLang*>(script_getLeader(L));
+#else
+    return static_cast<SelectLang*>(script_getLeader(L));
+#endif
 }
 //-----------------------------------------------------------------
 /**

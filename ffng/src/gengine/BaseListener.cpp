@@ -9,7 +9,9 @@
 #include "BaseListener.h"
 
 #include "OptionAgent.h"
+#if DANDAN
 #include "UnknownMsgException.h"
+#endif
 #include "SimpleMsg.h"
 #include "IntMsg.h"
 #include "StringMsg.h"
@@ -38,7 +40,11 @@ BaseListener::removeWatchers()
 void
 BaseListener::receiveSimple(const SimpleMsg *msg)
 {
+#if DANDAN
     throw UnknownMsgException(msg);
+#else
+    ERR_FAIL_MSG(msg->toString().c_str());
+#endif
 }
 //-----------------------------------------------------------------
 /**
@@ -47,7 +53,11 @@ BaseListener::receiveSimple(const SimpleMsg *msg)
 void
 BaseListener::receiveInt(const IntMsg *msg)
 {
+#if DANDAN
     throw UnknownMsgException(msg);
+#else
+    ERR_FAIL_MSG(msg->toString().c_str());
+#endif
 }
 //-----------------------------------------------------------------
 /**
@@ -56,7 +66,11 @@ BaseListener::receiveInt(const IntMsg *msg)
 void
 BaseListener::receiveString(const StringMsg *msg)
 {
+#if DANDAN
     throw UnknownMsgException(msg);
+#else
+    ERR_FAIL_MSG(msg->toString().c_str());
+#endif
 }
 
 

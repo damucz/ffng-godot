@@ -9,7 +9,11 @@
 #include "RoomAccess.h"
 
 #include "FRoom.h"
+#if DANDAN
 #include "LogicException.h"
+#else
+#include "ExInfo.h"
+#endif
 
 //-----------------------------------------------------------------
 /**
@@ -52,7 +56,11 @@ void
 RoomAccess::checkRoom() const
 {
     if (NULL == m_room) {
+#if DANDAN
         throw LogicException(ExInfo("room is not ready"));
+#else
+        ERR_FAIL_MSG(ExInfo("room is not ready").info().c_str());
+#endif
     }
 }
 //-----------------------------------------------------------------

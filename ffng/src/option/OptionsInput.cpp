@@ -19,7 +19,11 @@ OptionsInput::OptionsInput(MenuOptions *menu)
 MenuOptions *
 OptionsInput::getMenu()
 {
+#ifndef NO_SAFE_CAST
     return dynamic_cast<MenuOptions*>(m_state);
+#else
+    return static_cast<MenuOptions*>(m_state);
+#endif
 }
 //-----------------------------------------------------------------
 /**

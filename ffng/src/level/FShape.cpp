@@ -8,7 +8,12 @@
  */
 #include "FShape.h"
 
+#if DANDAN
 #include "LayoutException.h"
+#else
+#include "ExInfo.h"
+#include "core/error_macros.h"
+#endif
 #include "minmax.h"
 
 //-----------------------------------------------------------------
@@ -45,9 +50,15 @@ FShape::FShape(const std::string &shape)
                 ++x;
                 break;
             default:
+#if DANDAN
                 throw LayoutException(ExInfo("bad shape char")
                         .addInfo("char", shape[i])
                         .addInfo("shape", shape));
+#else
+                ERR_FAIL_MSG(ExInfo("bad shape char")
+                        .addInfo("char", shape[i])
+                        .addInfo("shape", shape).info().c_str());
+#endif
         }
     }
 

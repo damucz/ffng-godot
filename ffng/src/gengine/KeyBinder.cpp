@@ -9,7 +9,9 @@
 #include "KeyBinder.h"
 
 #include "Log.h"
+#if DANDAN
 #include "LogicException.h"
+#endif
 #include "BaseMsg.h"
 
 #include "GodotSDL.h"

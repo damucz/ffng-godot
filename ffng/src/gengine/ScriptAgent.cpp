@@ -10,7 +10,9 @@
 
 #include "ScriptState.h"
 #include "StringMsg.h"
+#if DANDAN
 #include "UnknownMsgException.h"
+#endif
 
 #include "options-script.h"
 
@@ -43,7 +45,11 @@ ScriptAgent::receiveString(const StringMsg *msg)
         scriptDo(msg->getValue());
     }
     else {
+#if DANDAN
         throw UnknownMsgException(msg);
+#else
+        ERR_FAIL_MSG(msg->toString().c_str());
+#endif
     }
 }
 

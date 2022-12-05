@@ -21,7 +21,9 @@
 #include "OptionAgent.h"
 #include "VideoAgent.h"
 #include "SoundAgent.h"
+#if DANDAN
 #include "LogicException.h"
+#endif
 #include "ResDialogPack.h"
 #include "LevelDesc.h"
 #include "Level.h"
@@ -101,8 +103,13 @@ WorldMap::initMap(const Path &mapfile)
     WorldBranch parser(NULL);
     m_startNode = parser.parseMap(mapfile, &m_ending, m_descPack);
     if (NULL == m_startNode) {
+#if DANDAN
         throw LogicException(ExInfo("cannot create world map")
                 .addInfo("file", mapfile.getNative()));
+#else
+        ERR_FAIL_MSG(ExInfo("cannot create world map")
+                .addInfo("file", mapfile.getNative()).info().c_str());
+#endif
     }
 }
 //-----------------------------------------------------------------
@@ -308,7 +315,11 @@ WorldMap::findLevelName(const std::string &codename) const
 {
     std::string result;
     const LevelDesc *desc =
+#ifndef NO_SAFE_CAST
         dynamic_cast<const LevelDesc*>(m_descPack->findDialogHard(codename));
+#else
+        static_cast<const LevelDesc*>(m_descPack->findDialogHard(codename));
+#endif
     if (desc) {
         result = desc->getLevelName();
     }
@@ -323,7 +334,11 @@ WorldMap::findDesc(const std::string &codename) const
 {
     std::string result;
     const LevelDesc *desc =
+#ifndef NO_SAFE_CAST
         dynamic_cast<const LevelDesc*>(m_descPack->findDialogHard(codename));
+#else
+        static_cast<const LevelDesc*>(m_descPack->findDialogHard(codename));
+#endif
     if (desc) {
         result = desc->getDesc();
     }

@@ -18,7 +18,11 @@
     inline DemoMode *
 getDemo(lua_State *L)
 {
+#ifndef NO_SAFE_CAST
     return dynamic_cast<DemoMode*>(script_getLeader(L));
+#else
+    return static_cast<DemoMode*>(script_getLeader(L));
+#endif
 }
 
 //-----------------------------------------------------------------

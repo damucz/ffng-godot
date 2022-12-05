@@ -28,7 +28,11 @@
     inline LevelScript *
 getLevelScript(lua_State *L)
 {
+#ifndef NO_SAFE_CAST
     return dynamic_cast<LevelScript*>(script_getLeader(L));
+#else
+    return static_cast<LevelScript*>(script_getLeader(L));
+#endif
 }
 //-----------------------------------------------------------------
     inline Cube *

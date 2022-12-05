@@ -10,7 +10,11 @@
 
 #include "FShape.h"
 #include "Rules.h"
+#if DANDAN
 #include "LayoutException.h"
+#else
+#include "ExInfo.h"
+#endif
 #include "Anim.h"
 #include "EffectDisintegrate.h"
 #include "DialogStack.h"

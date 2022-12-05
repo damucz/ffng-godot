@@ -12,7 +12,11 @@
 #include "RoomAccess.h"
 #include "FRoom.h"
 #include "StepCounter.h"
+#if DANDAN
 #include "LogicException.h"
+#else
+#include "ExInfo.h"
+#endif
 #include "CountAdvisor.h"
 
 //-----------------------------------------------------------------
@@ -34,7 +38,11 @@ void
 LevelCountDown::reset()
 {
     if (NULL == m_levelStatus) {
+#if DANDAN
         throw LogicException(ExInfo("level status is NULL"));
+#else
+        ERR_FAIL_MSG(ExInfo("level status is NULL").info().c_str());
+#endif
     }
     m_levelStatus->setRunning(true);
     m_countdown = -1;

@@ -4,8 +4,6 @@
 
 #include "Log.h"
 #include "ExInfo.h"
-#include "SDLException.h"
-#include "MixException.h"
 #include "Random.h"
 #include "BaseMsg.h"
 #include "OptionAgent.h"

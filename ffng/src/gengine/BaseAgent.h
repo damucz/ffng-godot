@@ -4,7 +4,11 @@
 #include "NoCopy.h"
 #include "BaseListener.h"
 #include "ExInfo.h"
+#if DANDAN
 #include "NameException.h"
+#else
+#include "core/error_macros.h"
+#endif
 #include "AgentPack.h"
 
 #include <string>
@@ -35,6 +39,8 @@ class BaseAgent : public NoCopy, public BaseListener {
  * Enables to obtain typed pointer
  * static VideoAgent *VideoAgent::agent();
  */
+#if DANDAN
+
 #define AGENT(TYPE, NAME) \
 public: \
 virtual const char *getName() const { return (NAME); } \
@@ -49,5 +55,41 @@ static TYPE *agent() \
 } \
 private: \
 static const char *sName() { return (NAME); }
+
+#else
+
+#ifndef NO_SAFE_CAST
+#define AGENT(TYPE, NAME) \
+public: \
+virtual const char *getName() const { return (NAME); } \
+static TYPE *agent() \
+{ \
+    TYPE *result = dynamic_cast<TYPE *>(AgentPack::getAgent(sName())); \
+    if (NULL == result) { \
+        ERR_FAIL_V_MSG(nullptr, ExInfo("cannot cast agent") \
+                .addInfo("name", sName()).info().c_str()); \
+    } \
+    return result; \
+} \
+private: \
+static const char *sName() { return (NAME); }
+#else
+#define AGENT(TYPE, NAME) \
+public: \
+virtual const char *getName() const { return (NAME); } \
+static TYPE *agent() \
+{ \
+    TYPE *result = static_cast<TYPE *>(AgentPack::getAgent(sName())); \
+    if (NULL == result) { \
+        ERR_FAIL_V_MSG(nullptr, ExInfo("cannot cast agent") \
+                .addInfo("name", sName()).info().c_str()); \
+    } \
+    return result; \
+} \
+private: \
+static const char *sName() { return (NAME); }
+#endif
+
+#endif
 
 #endif

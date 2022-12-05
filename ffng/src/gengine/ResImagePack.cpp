@@ -9,8 +9,10 @@
 #include "ResImagePack.h"
 
 #include "Path.h"
+#if DANDAN
 #include "ImgException.h"
 #include "SDLException.h"
+#endif
 #include "OptionAgent.h"
 #include "Log.h"
 
@@ -43,8 +45,13 @@ ResImagePack::loadImage(const Path &file)
 {
     SDL_Surface *raw_image = IMG_Load(file.getNative().c_str());
     if (NULL == raw_image) {
+#if DANDAN
         throw ImgException(ExInfo("Load")
                 .addInfo("file", file.getNative()));
+#else
+        ERR_FAIL_V_MSG(nullptr, ExInfo("Load")
+                .addInfo("file", file.getNative()).info().c_str());
+#endif
     }
 
 #if DANDAN

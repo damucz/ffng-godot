@@ -24,8 +24,12 @@
 #include "View.h"
 #include "OptionAgent.h"
 #include "VideoAgent.h"
+#if DANDAN
 #include "ScriptException.h"
 #include "LogicException.h"
+#else
+#include "core/os/file_access.h"
+#endif
 #include "DemoMode.h"
 #include "SoundAgent.h"
 #include "SubTitleAgent.h"
@@ -92,8 +96,13 @@ Level::fillStatus(LevelStatus *status)
 Level::own_initState()
 {
     if (NULL == m_desc) {
+#if DANDAN
         throw LogicException(ExInfo("level description is NULL")
                 .addInfo("codename", m_codename));
+#else
+        ERR_FAIL_MSG(ExInfo("level description is NULL")
+                .addInfo("codename", m_codename).info().c_str());
+#endif
     }
     m_countdown->reset();
     m_loading->reset();
@@ -304,6 +313,7 @@ Level::saveGame(const std::string &models)
 {
     if (m_levelScript->isRoom()) {
         Path file = Path::dataWritePath("saves/" + m_codename + ".lua");
+#if DANDAN
         FILE *saveFile = fopen(file.getNative().c_str(), "w");
         if (saveFile) {
             std::string moves =
@@ -317,6 +327,22 @@ Level::saveGame(const std::string &models)
             fclose(saveFile);
             displaySaveStatus();
         }
+#else
+        Error error;
+        FileAccess* saveFile = FileAccess::open(file.getNative().c_str(), FileAccess::WRITE, &error);
+        if (error == OK) {
+            std::string moves =
+                m_levelScript->room()->stepCounter()->getMoves();
+            saveFile->store_string("\nsaved_moves = '");
+            saveFile->store_string(moves.c_str());
+            saveFile->store_string("'\n");
+
+            saveFile->store_string("\nsaved_models = ");
+            saveFile->store_string(models.c_str());
+            saveFile->close();
+            displaySaveStatus();
+        }
+#endif
         else {
             LOG_WARNING(ExInfo("cannot save game")
                     .addInfo("file", file.getNative()));

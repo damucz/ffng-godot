@@ -10,8 +10,8 @@
 
 #include "Path.h"
 #include "ResImagePack.h"
-#include "ResourceException.h"
 #if DANDAN
+#include "ResourceException.h"
 #include "SurfaceLock.h"
 #include "PixelTool.h"
 #endif
@@ -36,10 +36,17 @@ LayeredPicture::LayeredPicture(const Path &bg_file, const V2 &loc,
         SDL_FreeSurface(m_colorMask);
         SDL_FreeSurface(m_surface);
 
+#if DANDAN
         throw ResourceException(ExInfo(
                     "lowerLayer and colorMask have different proportions")
                 .addInfo("lowerLayer", lowerLayer.getNative())
                 .addInfo("colorMask", colorMask.getNative()));
+#else
+        ERR_FAIL_MSG(ExInfo(
+                    "lowerLayer and colorMask have different proportions")
+                .addInfo("lowerLayer", lowerLayer.getNative())
+                .addInfo("colorMask", colorMask.getNative()).info().c_str());
+#endif
     }
 
     setNoActive();
@@ -63,9 +70,13 @@ LayeredPicture::LayeredPicture(const Path &bg_file, const V2 &loc,
 
                 void fragment(){
                     vec4 mask = texture(color_mask, UV);
-                    COLOR = texture(length(abs(mask - active_color)) < 0.1 ? lower_layer : TEXTURE, UV);
+                    vec4 color = texture(TEXTURE, UV);
+                    if (length(abs(mask - active_color)) < 0.1)
+                        color = texture(lower_layer, UV);
+                    COLOR = color;
                 }
                 )");
+        SDL_shaders["layered"] = shader;
     }
 
     DEV_ASSERT(shader.is_valid());

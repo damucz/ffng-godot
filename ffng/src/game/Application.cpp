@@ -27,7 +27,9 @@
 #include "ScriptAgent.h"
 #include "OptionAgent.h"
 #include "SubTitleAgent.h"
+#if DANDAN
 #include "ResourceException.h"
+#endif
 #include "OptionParams.h"
 #include "FFont.h"
 
@@ -163,6 +165,7 @@ Application::customizeGame()
         ScriptAgent::agent()->scriptInclude(initfile);
     }
     else {
+#if DANDAN
         throw ResourceException(ExInfo("init file not found")
                 .addInfo("path", initfile.getNative())
                 .addInfo("systemdir",
@@ -171,6 +174,16 @@ Application::customizeGame()
                     OptionAgent::agent()->getParam("userdir"))
                 .addInfo("hint",
                     "try command line option \"systemdir=path/to/data\""));
+#else
+        ERR_FAIL_MSG(ExInfo("init file not found")
+                .addInfo("path", initfile.getNative())
+                .addInfo("systemdir",
+                    OptionAgent::agent()->getParam("systemdir"))
+                .addInfo("userdir",
+                    OptionAgent::agent()->getParam("userdir"))
+                .addInfo("hint",
+                    "try command line option \"systemdir=path/to/data\"").info().c_str());
+#endif
     }
 }
 //-----------------------------------------------------------------
@@ -187,9 +200,6 @@ Application::addSoundAgent()
     if (OptionAgent::agent()->getAsBool("sound", true)) {
 #ifdef DANDAN
         soundAgent = new SDLSoundAgent();
-#else
-        soundAgent = new GodotSoundAgent();
-#endif
         try {
             soundAgent->init();
         }
@@ -198,6 +208,10 @@ Application::addSoundAgent()
             delete soundAgent;
             soundAgent = new DummySoundAgent();
         }
+#else
+        soundAgent = new GodotSoundAgent();
+        soundAgent->init();
+#endif
     }
     else {
         soundAgent = new DummySoundAgent();

@@ -36,7 +36,6 @@ public:
     enum Type {
         NONE,
         EMPTY,
-        SCREEN,     // like viewframe, but just singleton
         TEXTURE,
         VIEWPORT,
     };
@@ -51,9 +50,6 @@ public:
     // cache up to next frame
     List<Ref<Texture>> _textures;
     List<Ref<DynamicFont>> _fonts;
-
-    // empty
-    SDL_Color color;
 
     // texture
     RID texture;

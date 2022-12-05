@@ -9,7 +9,9 @@
 #include "FsPath.h"
 
 #include "Log.h"
+#if DANDAN
 #include "PathException.h"
+#endif
 
 #include <string.h>
 #include <errno.h>
@@ -19,6 +21,7 @@
 #include <unistd.h>
 #else
 #include "GodotSDL.h"
+#include "core/os/file_access.h"
 #endif
 
 //-----------------------------------------------------------------
@@ -43,9 +46,13 @@ FsPath::exists(const std::string &file)
         return true;
     }
 
+#if DANDAN
     struct stat buf;
     int error = stat(file.c_str(), &buf);
     return !error;
+#else
+    return FileAccess::exists(file.c_str()) || ResourceLoader::exists(file.c_str());
+#endif
 }
 //-----------------------------------------------------------------
 /**
@@ -107,9 +114,15 @@ createDir(const std::string &dir)
     int error = Godot_mkdir(dir.c_str(), 0777);
 #endif
     if (error) {
+#if DANDAN
         throw PathException(ExInfo("cannot create dir")
             .addInfo("stderror", strerror(errno))
             .addInfo("dir", dir));
+#else
+        ERR_FAIL_MSG(ExInfo("cannot create dir")
+            .addInfo("stderror", strerror(errno))
+            .addInfo("dir", dir).info().c_str());
+#endif
     }
 }
 //-----------------------------------------------------------------

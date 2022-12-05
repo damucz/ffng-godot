@@ -18,7 +18,11 @@
     inline Labels *
 getLabels(lua_State *L)
 {
+#ifndef NO_SAFE_CAST
     return dynamic_cast<Labels*>(script_getLeader(L));
+#else
+    return static_cast<Labels*>(script_getLeader(L));
+#endif
 }
 //-----------------------------------------------------------------
 /**

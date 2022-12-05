@@ -10,7 +10,11 @@
 
 #include "Log.h"
 #include "Environ.h"
+#if DANDAN
 #include "LogicException.h"
+#else
+#include "core/error_macros.h"
+#endif
 
 //-----------------------------------------------------------------
 void
@@ -78,8 +82,13 @@ OptionParams::checkValidity(const std::string &name, const std::string &/*value*
 {
     t_params::const_iterator it = m_params.find(name);
     if (m_params.end() == it) {
+#if DANDAN
         throw LogicException(ExInfo("unknown option")
                 .addInfo("name", name));
+#else
+        ERR_FAIL_MSG(ExInfo("unknown option")
+                .addInfo("name", name).info().c_str());
+#endif
     }
 
     //TODO: check value type

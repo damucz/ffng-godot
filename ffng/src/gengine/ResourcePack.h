@@ -4,7 +4,9 @@
 #include "Log.h"
 #include "Random.h"
 #include "INamed.h"
+#if DANDAN
 #include "ResourceException.h"
+#endif
 
 #include <string>
 #include <vector>
@@ -89,10 +91,17 @@ class ResourcePack : public INamed {
             ++(range.first);
         }
         if (range.second == range.first) {
+#if DANDAN
             throw ResourceException(ExInfo("no such resource at index")
                     .addInfo("name", name)
                     .addInfo("index", rank)
                     .addInfo("pack", toString()));
+#else
+            ERR_FAIL_V_MSG(nullptr, ExInfo("no such resource at index")
+                    .addInfo("name", name)
+                    .addInfo("index", rank)
+                    .addInfo("pack", toString()).info().c_str());
+#endif
         }
         return range.first->second;
     }

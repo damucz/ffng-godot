@@ -25,10 +25,11 @@ Uint8 SDL_mouse_buttons = 0;
 void _SDL_CreateViewport(SDL_Surface* surface, int width, int height, bool screen) {
     auto* vs = VS::get_singleton();
     RID viewport = vs->viewport_create();
+    vs->viewport_set_hide_scenario(viewport, true);
     vs->viewport_set_disable_3d(viewport, true);
     vs->viewport_set_disable_environment(viewport, true);
     vs->viewport_set_hdr(viewport, false);
-    vs->viewport_set_msaa(viewport, screen ? VS::VIEWPORT_MSAA_8X : VS::VIEWPORT_MSAA_DISABLED);
+    //vs->viewport_set_msaa(viewport, screen ? VS::VIEWPORT_MSAA_8X : VS::VIEWPORT_MSAA_DISABLED);      not supported in javascript, disabled for now
     vs->viewport_set_active(viewport, true);
     vs->viewport_set_size(viewport, width, height);
     vs->viewport_set_usage(viewport, VS::VIEWPORT_USAGE_2D_NO_SAMPLING);
@@ -90,11 +91,7 @@ void SDL_Quit() {
 }
 
 SDL_Surface* SDL_SetVideoMode(int width, int height, Uint8 bpp, Uint32 videoflags) {
-    SDL_Surface* screen = memnew(SDL_Surface);
-    screen->type = SDL_Surface::Type::SCREEN;
-    screen->w = width;
-    screen->h = height;
-    _SDL_CreateViewport(screen, width, height, true);
+    SDL_Surface* screen = SDL_CreateRGBSurface(videoflags, width, height, bpp, 0, 0, 0, 0);
 
     //SDL_FitScreen();      Called later after the backbuffer is swapped.
 
@@ -102,18 +99,18 @@ SDL_Surface* SDL_SetVideoMode(int width, int height, Uint8 bpp, Uint32 videoflag
 }
 
 void SDL_Flip(SDL_Surface* screen) {
-    DEV_ASSERT(screen->type == SDL_Surface::Type::SCREEN);
+    DEV_ASSERT(screen->type == SDL_Surface::Type::VIEWPORT);
     auto* vs = VS::get_singleton();
 
     RID canvas_item = SDL_node->get_canvas_item();
     vs->canvas_item_clear(canvas_item);
-    //vs->canvas_item_set_parent(screen->canvas_item, SDL_node->get_canvas_item());
+    //vs->canvas_item_set_parent(screen->canvas_items.back()->get(), SDL_node->get_canvas_item());
 
     RID texture = vs->viewport_get_texture(screen->viewport);
-    vs->texture_set_flags(texture, VS::TEXTURE_FLAG_REPEAT | VS::TEXTURE_FLAG_FILTER);
+    //vs->texture_set_flags(texture, VS::TEXTURE_FLAG_REPEAT | VS::TEXTURE_FLAG_FILTER);
     vs->canvas_item_add_texture_rect(canvas_item, {0, 0, (real_t)screen->w, (real_t)screen->h}, texture);
 
-    WARN_PRINT(vformat("screen flipped (%d x %d)", screen->w, screen->h));
+    //WARN_PRINT(vformat("screen flipped (%d x %d)", screen->w, screen->h));
 
     SDL_FitScreen(screen);
 }
@@ -146,7 +143,6 @@ void SDL_Purge() {
     }
 
     {
-        SDL_Surface* surface = nullptr;
         for (List<SDL_Surface*>::Element *E = SDL_to_be_removed.front(); E; E = E->next()) {
             SDL_Surface* surface = E->get();
             _SDL_PurgeCanvas(surface);
@@ -225,9 +221,6 @@ void SDL_BlitSurface(SDL_Surface* surface, SDL_Rect* src_rect, SDL_Surface* scre
         case SDL_Surface::Type::EMPTY: {
             _SDL_CreateViewport(screen, screen->w, screen->h);
             screen->type = SDL_Surface::Type::VIEWPORT;
-            _SDL_CreateCanvas(screen);
-            Color c{(float)screen->color.r, (float)screen->color.g, (float)screen->color.b, (float)screen->color.unused};
-            vs->canvas_item_add_rect(screen->canvas_items.back()->get(), {0, 0, (real_t)screen->w, (real_t)screen->h}, c);
             SDL_BlitSurface(surface, src_rect, screen, dest_rect);
             break;
         }
@@ -242,7 +235,6 @@ void SDL_BlitSurface(SDL_Surface* surface, SDL_Rect* src_rect, SDL_Surface* scre
             SDL_BlitSurface(surface, src_rect, screen, dest_rect);
             break;
         }
-        case SDL_Surface::Type::SCREEN:
         case SDL_Surface::Type::VIEWPORT: {
             DEV_ASSERT(screen->viewport.is_valid());
             Rect2 sr((real_t)srect.x, (real_t)srect.y, (real_t)srect.w, (real_t)srect.h);
@@ -251,13 +243,13 @@ void SDL_BlitSurface(SDL_Surface* surface, SDL_Rect* src_rect, SDL_Surface* scre
             switch(surface->type) {
                 case SDL_Surface::Type::TEXTURE: {
                     DEV_ASSERT(surface->texture.is_valid());
-                    WARN_PRINT(vformat("blit texture (%s) to screen/viewport (%s)", String(sr), String(dr)));
+                    //WARN_PRINT(vformat("blit texture (%s) to screen/viewport (%s)", String(sr), String(dr)));
                     stexture = surface->texture;
                     break;
                 }
                 case SDL_Surface::Type::VIEWPORT: {
                     DEV_ASSERT(surface->viewport.is_valid());
-                    WARN_PRINT(vformat("blit viewport (%s) to screen/viewport (%s)", String(sr), String(dr)));
+                    //WARN_PRINT(vformat("blit viewport (%s) to screen/viewport (%s)", String(sr), String(dr)));
                     stexture = vs->viewport_get_texture(surface->viewport);
                     
                     vs->viewport_set_parent_viewport(surface->viewport, screen->viewport);
@@ -267,7 +259,7 @@ void SDL_BlitSurface(SDL_Surface* surface, SDL_Rect* src_rect, SDL_Surface* scre
 
                     vs->viewport_set_active(surface->viewport, true);
                     vs->viewport_set_active(screen->viewport, true);
-                    
+                   
                     break;
                 }
             }
@@ -281,7 +273,7 @@ void SDL_BlitSurface(SDL_Surface* surface, SDL_Rect* src_rect, SDL_Surface* scre
         default:
             DEV_ASSERT(false);
     }
-    DEV_ASSERT((screen->type == SDL_Surface::Type::SCREEN || screen->type == SDL_Surface::Type::VIEWPORT) && screen->viewport.is_valid());
+    DEV_ASSERT(screen->type == SDL_Surface::Type::VIEWPORT && screen->viewport.is_valid());
 }
 
 void SDL_FillRect(SDL_Surface* screen, SDL_Rect* rect, SDL_Color color) {

@@ -12,7 +12,11 @@
 #include "OptionAgent.h"
 #include "Dialog.h"
 #include "FsPath.h"
+#if DANDAN
 #include "PathException.h"
+#else
+#include "core/os/file_access.h"
+#endif
 
 #include <stdio.h>
 
@@ -38,6 +42,7 @@ Path::dataPath(const std::string &file, bool writeable)
     Path datapath = dataUserPath(file);
 
     if (!datapath.exists())  {
+#if DANDAN
         FILE *try_open = NULL;
         if (writeable) {
             try {
@@ -58,6 +63,24 @@ Path::dataPath(const std::string &file, bool writeable)
         else {
             datapath = dataSystemPath(file);
         }
+#else
+        FileAccess *try_open = NULL;
+        if (writeable) {
+            LOG_INFO(ExInfo("creating path")
+                    .addInfo("path", datapath.getNative()));
+            FsPath::createPath(datapath.getPosixName());
+
+            Error error;
+            try_open = FileAccess::open(datapath.getNative().c_str(), FileAccess::WRITE, &error);
+        }
+
+        if (try_open) {
+            try_open->close();
+        }
+        else {
+            datapath = dataSystemPath(file);
+        }
+#endif
     }
 
     return datapath;

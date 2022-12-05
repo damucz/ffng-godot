@@ -23,7 +23,11 @@ PedoInput::PedoInput(Pedometer *pedometer)
 Pedometer *
 PedoInput::getPedo()
 {
+#ifndef NO_SAFE_CAST
     return dynamic_cast<Pedometer*>(m_state);
+#else
+    return static_cast<Pedometer*>(m_state);
+#endif
 }
 //-----------------------------------------------------------------
 void

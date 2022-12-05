@@ -15,12 +15,16 @@
 #include "FsPath.h"
 #include "ScriptAgent.h"
 #include "StringTool.h"
+#if DANDAN
 #include "HelpException.h"
 #include "LogicException.h"
 #include "ScriptException.h"
+#endif
 #include "OptionParams.h"
 #include "StringMsg.h"
+#if DANDAN
 #include "UnknownMsgException.h"
+#endif
 #include "minmax.h"
 
 #include <stdlib.h> //getenv
@@ -33,12 +37,12 @@
 
 //NOTE: SYSTEM_DATA_DIR is set to "$(datadir)/games/@PACKAGE@"
 #ifndef SYSTEM_DATA_DIR
-#define SYSTEM_DATA_DIR ""
+#define SYSTEM_DATA_DIR "res:/"
 #endif
 
 //NOTE: userdir = $HOME + USER_DATA_DIR
 #ifndef USER_DATA_DIR
-#define USER_DATA_DIR ".fillets-ng"
+#define USER_DATA_DIR ""
 #endif
 
 const char *OptionAgent::CONFIG_FILE = "script/options.lua";
@@ -97,7 +101,11 @@ OptionAgent::prepareDataPaths()
     OptionAgent::agent()->setParam("systemdir", SYSTEM_DATA_DIR);
 
     std::string userdir = "";
+#if DANDAN
     const char *home = getenv("HOME");
+#else
+    const char *home = "user:/";
+#endif
     if (home) {
         userdir = FsPath::join(home, USER_DATA_DIR);
         OptionAgent::agent()->setParam("userdir", userdir);
@@ -162,19 +170,38 @@ OptionAgent::parseDashOpt(const std::string &arg,
         const OptionParams &params)
 {
     if ("-h" == arg || "--help" == arg) {
+#if DANDAN
         throw HelpException(ExInfo(getHelpInfo(params)));
+#else
+        ERR_FAIL_MSG(ExInfo(getHelpInfo(params)).info().c_str());
+#endif
     }
     else if ("-v" == arg || "--version" == arg) {
+#if DANDAN
         throw HelpException(ExInfo(getVersionInfo()));
+#else
+        ERR_FAIL_MSG(ExInfo(getVersionInfo()).info().c_str());
+#endif
     }
     else if ("-c" == arg || "--config" == arg) {
+#if DANDAN
         throw HelpException(ExInfo(params.getConfig(m_environ)));
+#else
+        ERR_FAIL_MSG(ExInfo(params.getConfig(m_environ)).info().c_str());
+#endif
     }
     else {
+#if DANDAN
         throw LogicException(ExInfo("unknown option")
                 .addInfo("arg", arg)
                 .addInfo("use",
                     getParam("program") + " --help"));
+#else
+        ERR_FAIL_MSG(ExInfo("unknown option")
+                .addInfo("arg", arg)
+                .addInfo("use",
+                    getParam("program") + " --help").info().c_str());
+#endif
     }
 }
 //-----------------------------------------------------------------
@@ -189,10 +216,17 @@ OptionAgent::parseParamOpt(const std::string &arg,
         setParam(name, value);
     }
     else {
+#if DANDAN
         throw LogicException(ExInfo("unknown option")
                 .addInfo("arg", arg)
                 .addInfo("use",
                     getParam("program") + " --help"));
+#else
+        ERR_FAIL_MSG(ExInfo("unknown option")
+                .addInfo("arg", arg)
+                .addInfo("use",
+                    getParam("program") + " --help").info().c_str());
+#endif
     }
 }
 //-----------------------------------------------------------------
@@ -298,6 +332,7 @@ OptionAgent::setPersistent(const std::string &name, const std::string &value)
     Environ *swap_env = m_environ;
     m_environ = new Environ();
 
+#if DANDAN
     try {
         if (config.exists()) {
             ScriptAgent::agent()->scriptInclude(config);
@@ -306,6 +341,11 @@ OptionAgent::setPersistent(const std::string &name, const std::string &value)
     catch (ScriptException &e) {
         LOG_WARNING(e.info());
     }
+#else
+    if (config.exists()) {
+        ScriptAgent::agent()->scriptInclude(config);
+    }
+#endif
     setParam(name, value);
     m_environ->store(config);
 
@@ -390,17 +430,26 @@ OptionAgent::receiveString(const StringMsg *msg)
             readUserConfig();
         }
         else {
+#if DANDAN
             throw UnknownMsgException(msg);
+#else
+            ERR_FAIL_MSG(msg->toString().c_str());
+#endif
         }
     }
     else {
+#if DANDAN
         throw UnknownMsgException(msg);
+#else
+        ERR_FAIL_MSG(msg->toString().c_str());
+#endif
     }
 }
 //-----------------------------------------------------------------
 void
 OptionAgent::readSystemConfig()
 {
+#if DANDAN
     try {
         Path systemConfig = Path::dataSystemPath(CONFIG_FILE);
         if (systemConfig.exists()) {
@@ -410,11 +459,18 @@ OptionAgent::readSystemConfig()
     catch (ScriptException &e) {
         LOG_WARNING(e.info());
     }
+#else
+    Path systemConfig = Path::dataSystemPath(CONFIG_FILE);
+    if (systemConfig.exists()) {
+        ScriptAgent::agent()->scriptInclude(systemConfig);
+    }
+#endif
 }
 //-----------------------------------------------------------------
 void
 OptionAgent::readUserConfig()
 {
+#if DANDAN
     try {
         Path userConfig = Path::dataUserPath(CONFIG_FILE);
         if (userConfig.exists()) {
@@ -424,5 +480,11 @@ OptionAgent::readUserConfig()
     catch (ScriptException &e) {
         LOG_WARNING(e.info());
     }
+#else
+    Path userConfig = Path::dataUserPath(CONFIG_FILE);
+    if (userConfig.exists()) {
+        ScriptAgent::agent()->scriptInclude(userConfig);
+    }
+#endif
 }
 

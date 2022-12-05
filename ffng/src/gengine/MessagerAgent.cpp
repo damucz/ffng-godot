@@ -11,7 +11,9 @@
 #include "Log.h"
 #include "BaseMsg.h"
 #include "BaseListener.h"
+#if DANDAN
 #include "NameException.h"
+#endif
 
 #include <memory> // for auto_ptr
 
@@ -54,8 +56,13 @@ MessagerAgent::forwardNewMsg(BaseMsg *msg)
 
     t_listeners::iterator it = m_listeners.find(listenerName);
     if (m_listeners.end() == it) {
+#if DANDAN
         throw NameException(ExInfo("cannot find listener")
                 .addInfo("name", listenerName));
+#else
+        ERR_FAIL_MSG(ExInfo("cannot find listener")
+                .addInfo("name", listenerName).info().c_str());
+#endif
     }
 
     msg->sendActual(it->second);

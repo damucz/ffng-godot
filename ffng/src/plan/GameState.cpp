@@ -13,7 +13,9 @@
 #include "MultiDrawer.h"
 
 #include "Log.h"
+#if DANDAN
 #include "LogicException.h"
+#endif
 #include "InputAgent.h"
 #include "VideoAgent.h"
 #include "MessagerAgent.h"
@@ -77,8 +79,13 @@ GameState::initState(StateManager *manager)
 GameState::updateState()
 {
     if (!m_active) {
+#if DANDAN
         throw LogicException(ExInfo("update - state is not active")
                 .addInfo("name", getName()));
+#else
+        ERR_FAIL_MSG(ExInfo("update - state is not active")
+                .addInfo("name", getName()).info().c_str());
+#endif
     }
 
     own_updateState();
@@ -91,8 +98,13 @@ GameState::updateState()
 GameState::pauseState()
 {
     if (!m_active) {
+#if DANDAN
         throw LogicException(ExInfo("pause - state is not active")
                 .addInfo("name", getName()));
+#else
+        ERR_FAIL_MSG(ExInfo("pause - state is not active")
+                .addInfo("name", getName()).info().c_str());
+#endif
     }
 
     own_pauseState();
@@ -108,8 +120,13 @@ GameState::pauseState()
 GameState::resumeState()
 {
     if (m_active) {
+#if DANDAN
         throw LogicException(ExInfo("resume - state is already active")
                 .addInfo("name", getName()));
+#else
+        ERR_FAIL_MSG(ExInfo("resume - state is already active")
+                .addInfo("name", getName()).info().c_str());
+#endif
     }
     m_active = true;
     own_resumeState();
@@ -124,8 +141,13 @@ GameState::cleanState()
 {
     LOG_DEBUG(ExInfo("cleanState").addInfo("name", getName()));
     if (!m_active) {
+#if DANDAN
         throw LogicException(ExInfo("clean - state is not active")
                 .addInfo("name", getName()));
+#else
+        ERR_FAIL_MSG(ExInfo("clean - state is not active")
+                .addInfo("name", getName()).info().c_str());
+#endif
     }
     own_cleanState();
     unHandlers();

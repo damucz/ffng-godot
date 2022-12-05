@@ -10,7 +10,9 @@
 
 #include "RoomAccess.h"
 #include "FRoom.h"
+#if DANDAN
 #include "LoadException.h"
+#endif
 #include "minmax.h"
 
 //-----------------------------------------------------------------
@@ -77,6 +79,7 @@ LevelLoading::nextLoadAction()
         for (int i = 0; i < m_loadSpeed
                 && !m_loadedMoves.empty(); ++i)
         {
+#if DANDAN
             try {
                 char symbol = m_loadedMoves[0];
                 m_loadedMoves.erase(0, 1);
@@ -87,6 +90,12 @@ LevelLoading::nextLoadAction()
                 throw LoadException(ExInfo(e.info())
                         .addInfo("remain", m_loadedMoves));
             }
+#else
+            char symbol = m_loadedMoves[0];
+            m_loadedMoves.erase(0, 1);
+
+            m_access->room()->loadMove(symbol);
+#endif
         }
     }
 }

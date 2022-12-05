@@ -10,13 +10,17 @@
 
 #include "Log.h"
 #include "Path.h"
+#if DANDAN
 #include "ImgException.h"
 #include "SDLException.h"
 #include "LogicException.h"
+#endif
 #include "AgentPack.h"
 #include "SimpleMsg.h"
 #include "StringMsg.h"
+#if DANDAN
 #include "UnknownMsgException.h"
+#endif
 #include "OptionAgent.h"
 #if DANDAN
 #include "SysVideo.h"
@@ -157,10 +161,17 @@ VideoAgent::changeVideoMode(int screen_width, int screen_height)
 #endif
     }
     else {
+#if DANDAN
         throw SDLException(ExInfo("SetVideoMode")
                 .addInfo("width", screen_width)
                 .addInfo("height", screen_height)
                 .addInfo("bpp", screen_bpp));
+#else
+        ERR_FAIL_MSG(ExInfo("SetVideoMode")
+                .addInfo("width", screen_width)
+                .addInfo("height", screen_height)
+                .addInfo("bpp", screen_bpp).info().c_str());
+#endif
     }
 }
 //-----------------------------------------------------------------
@@ -215,7 +226,11 @@ VideoAgent::receiveSimple(const SimpleMsg *msg)
         options->setPersistent("fullscreen", toggle);
     }
     else {
+#if DANDAN
         throw UnknownMsgException(msg);
+#else
+        ERR_FAIL_MSG(msg->toString().c_str());
+#endif
     }
 }
 //-----------------------------------------------------------------
@@ -238,11 +253,19 @@ VideoAgent::receiveString(const StringMsg *msg)
             }
         }
         else {
+#if DANDAN
             throw UnknownMsgException(msg);
+#else
+            ERR_FAIL_MSG(msg->toString().c_str());
+#endif
         }
     }
     else {
+#if DANDAN
         throw UnknownMsgException(msg);
+#else
+        ERR_FAIL_MSG(msg->toString().c_str());
+#endif
     }
 }
 

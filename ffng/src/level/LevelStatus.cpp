@@ -11,7 +11,11 @@
 #include "def-script.h"
 #include "Path.h"
 #include "ScriptState.h"
+#if DANDAN
 #include "ScriptException.h"
+#else
+#include "core/os/file_access.h"
+#endif
 #include "DemoMode.h"
 
 extern "C" {
@@ -23,7 +27,11 @@ extern "C" {
    inline LevelStatus *
 getStatus(lua_State *L)
 {
+#ifndef NO_SAFE_CAST
     return dynamic_cast<LevelStatus*>(script_getLeader(L));
+#else
+    return static_cast<LevelStatus*>(script_getLeader(L));
+#endif
 }
 
 
@@ -91,6 +99,7 @@ LevelStatus::readSolvedMoves()
 
     Path oldSolution = Path::dataReadPath(getSolutionFilename());
     if (oldSolution.exists()) {
+#if DANDAN
         try {
             scriptDo("saved_moves=nil");
             scriptInclude(oldSolution);
@@ -99,6 +108,11 @@ LevelStatus::readSolvedMoves()
         catch (ScriptException &e) {
             LOG_WARNING(e.info());
         }
+#else
+        scriptDo("saved_moves=nil");
+        scriptInclude(oldSolution);
+        scriptDo("status_readMoves(saved_moves)");
+#endif
     }
 
     return m_savedMoves;
@@ -115,6 +129,7 @@ LevelStatus::writeSolvedMoves(const std::string &moves)
 
     if (prevMoves.empty() || moves.size() < prevMoves.size()) {
         Path file = Path::dataWritePath(getSolutionFilename());
+#if DANDAN
         FILE *saveFile = fopen(file.getNative().c_str(), "w");
         if (saveFile) {
             fputs("\nsaved_moves = '", saveFile);
@@ -122,6 +137,16 @@ LevelStatus::writeSolvedMoves(const std::string &moves)
             fputs("'\n", saveFile);
             fclose(saveFile);
         }
+#else
+        Error error;
+        FileAccess* saveFile = FileAccess::open(file.getNative().c_str(), FileAccess::WRITE, &error);
+        if (error == OK) {
+            saveFile->store_string("\nsaved_moves = '");
+            saveFile->store_string(moves.c_str());
+            saveFile->store_string("'\n");
+            saveFile->close();
+        }
+#endif
         else {
             LOG_WARNING(ExInfo("cannot save solution")
                     .addInfo("file", file.getNative())

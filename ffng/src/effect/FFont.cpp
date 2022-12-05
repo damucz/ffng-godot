@@ -10,9 +10,9 @@
 
 #include "Log.h"
 #include "Path.h"
+#if DANDAN
 #include "TTFException.h"
 #include "SDLException.h"
-#if DANDAN
 #include "Outline.h"
 #endif
 
@@ -64,8 +64,13 @@ FFont::FFont(const Path &file_ttf, int height)
 {
     m_ttfont = TTF_OpenFont(file_ttf.getNative().c_str(), height);
     if (!m_ttfont) {
+#if DANDAN
         throw TTFException(ExInfo("OpenFont")
                 .addInfo("file", file_ttf.getNative()));
+#else
+        ERR_FAIL_MSG(ExInfo("OpenFont")
+                .addInfo("file", file_ttf.getNative()).info().c_str());
+#endif
     }
 
     //NOTE: bg color will be set to be transparent
@@ -86,7 +91,11 @@ void
 FFont::init()
 {
     if (TTF_Init() < 0) {
+#if DANDAN
         throw TTFException(ExInfo("Init"));
+#else
+        ERR_FAIL_MSG(ExInfo("Init").info().c_str());
+#endif
     }
 }
 //-----------------------------------------------------------------
@@ -131,8 +140,13 @@ FFont::renderText(const std::string &text, const SDL_Color &color) const
     SDL_Surface *raw_surface = TTF_RenderUTF8_Shaded(m_ttfont, content.c_str(),
             color, m_bg);
     if (!raw_surface) {
+#if DANDAN
         throw TTFException(ExInfo("RenderUTF8")
                 .addInfo("text", text));
+#else
+        ERR_FAIL_V_MSG(nullptr, ExInfo("RenderUTF8")
+                .addInfo("text", text).info().c_str());
+#endif
     }
 
 #if DANDAN

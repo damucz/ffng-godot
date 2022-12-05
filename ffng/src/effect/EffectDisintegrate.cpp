@@ -44,9 +44,12 @@ EffectDisintegrate::EffectDisintegrate()
                 }
 
                 void fragment(){
-                    COLOR = disint < rand(UV) * 256.0 ? vec4(0.0, 0.0, 0.0, 0.0) : texture(TEXTURE, UV);
+                    if (disint < rand(UV) * 256.0)
+                        discard;
+                    COLOR = texture(TEXTURE, UV);
                 }
                 )");
+        SDL_shaders[NAME] = shader;
     }
 
     DEV_ASSERT(shader.is_valid());
