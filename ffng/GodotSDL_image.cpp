@@ -1,5 +1,6 @@
 #include "GodotSDL_image.h"
 #include "core/io/resource_loader.h"
+#include <string>
 
 SDL_Surface* IMG_Load(const char* filename) {
     auto* surface = memnew(SDL_Surface);
