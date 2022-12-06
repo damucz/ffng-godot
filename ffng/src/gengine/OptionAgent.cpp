@@ -42,7 +42,7 @@
 
 //NOTE: userdir = $HOME + USER_DATA_DIR
 #ifndef USER_DATA_DIR
-#define USER_DATA_DIR ""
+#define USER_DATA_DIR "user:/"
 #endif
 
 const char *OptionAgent::CONFIG_FILE = "script/options.lua";
@@ -104,7 +104,7 @@ OptionAgent::prepareDataPaths()
 #if DANDAN
     const char *home = getenv("HOME");
 #else
-    const char *home = "user:/";
+    const char *home = "";
 #endif
     if (home) {
         userdir = FsPath::join(home, USER_DATA_DIR);

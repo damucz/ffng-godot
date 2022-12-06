@@ -353,10 +353,3 @@ void SDL_Delay(Uint32 delay) {
 const char* SDL_GetError() {
     return "SDL error";
 }
-
-int Godot_mkdir(const char* name, int permissions) {
-    DirAccess* da = DirAccess::create(DirAccess::ACCESS_FILESYSTEM);
-    Error error = da->make_dir(name);
-    memdelete(da);
-    return error;
-}

@@ -22,6 +22,7 @@
 #else
 #include "GodotSDL.h"
 #include "core/os/file_access.h"
+#include "core/os/dir_access.h"
 #endif
 
 //-----------------------------------------------------------------
@@ -51,7 +52,7 @@ FsPath::exists(const std::string &file)
     int error = stat(file.c_str(), &buf);
     return !error;
 #else
-    return FileAccess::exists(file.c_str()) || ResourceLoader::exists(file.c_str());
+    return FileAccess::exists(file.c_str()) || DirAccess::exists(file.c_str()) || ResourceLoader::exists(file.c_str());
 #endif
 }
 //-----------------------------------------------------------------
@@ -91,6 +92,7 @@ dirPath(const std::string &file)
 
     return dirs;
 }
+#if DANDAN
 //-----------------------------------------------------------------
 /**
  * Create dir.
@@ -104,27 +106,18 @@ createDir(const std::string &dir)
         return;
     }
 
-#if DANDAN
 #ifdef WIN32
     int error = mkdir(dir.c_str());
 #else
     int error = mkdir(dir.c_str(), 0777);
 #endif
-#else
-    int error = Godot_mkdir(dir.c_str(), 0777);
-#endif
     if (error) {
-#if DANDAN
         throw PathException(ExInfo("cannot create dir")
             .addInfo("stderror", strerror(errno))
             .addInfo("dir", dir));
-#else
-        ERR_FAIL_MSG(ExInfo("cannot create dir")
-            .addInfo("stderror", strerror(errno))
-            .addInfo("dir", dir).info().c_str());
-#endif
     }
 }
+#endif
 //-----------------------------------------------------------------
 /**
  * Create all directories in path (like "mkdir -p").
@@ -135,8 +128,14 @@ FsPath::createPath(const std::string &file)
 {
     std::string parent = dirPath(file);
     if (!FsPath::exists(parent)) {
+#if DANDAN
         createPath(parent);
         createDir(parent);
+#else
+	DirAccess* da = DirAccess::create(DirAccess::ACCESS_USERDATA);
+	Error err = da->make_dir_recursive(parent.c_str());
+	memdelete(da);
+#endif
     }
 }
 

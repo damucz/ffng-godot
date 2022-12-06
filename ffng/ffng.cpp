@@ -137,7 +137,7 @@ void ffng::_notification(int what) {
 			for (int i = 0; i < SDLK_LAST; ++i)
 			{
 				static KeyList keys[SDLK_LAST] = {
-					KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN,
+					KEY_UP, KEY_LEFT, KEY_DOWN, KEY_RIGHT,
 					KEY_I, KEY_J, KEY_K, KEY_L,
 					KEY_W, KEY_A, KEY_S, KEY_D,
 					KEY_SPACE, KEY_F1, KEY_F2, KEY_F3, KEY_F5, KEY_F6, KEY_F10,

@@ -93,10 +93,10 @@ extern Dictionary SDL_shaders;
 #define SDLK_F1 13              // StateInput: help
 #define SDLK_F2 14              // LevelInput: save
 #define SDLK_F3 15              // LevelInput: load
-#define SDLK_BACKSPACE 16       // LevelInput: restart
-#define SDLK_F5 17              // LevelInput: show number of steps
-#define SDLK_F6 18              // StateInput: subtitles
-#define SDLK_F10 19             // StateInput: menu
+#define SDLK_F5 16              // LevelInput: show number of steps
+#define SDLK_F6 17              // StateInput: subtitles
+#define SDLK_F10 18             // StateInput: menu
+#define SDLK_BACKSPACE 19       // LevelInput: restart
 #define SDLK_MINUS 20           // LevelInput: undo
 #define SDLK_KP_MINUS 21        // LevelInput: undo
 #define SDLK_PLUS 22            // LevelInput: redo
@@ -179,8 +179,6 @@ Uint32 SDL_GetTicks();
 void SDL_Delay(Uint32 delay);
 
 const char* SDL_GetError();
-
-int Godot_mkdir(const char* name, int permissions);
 
 
 void _SDL_CreateViewport(SDL_Surface* surface, int width, int height, bool screen = false);
